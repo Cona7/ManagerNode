@@ -1,7 +1,5 @@
 package com.yammer;
 
-import javax.validation.constraints.NotNull;
-
 import com.google.gson.Gson;
 import org.hibernate.validator.constraints.NotBlank;
 

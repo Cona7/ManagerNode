@@ -10,39 +10,33 @@ import java.util.Random;
 
 public class NodeInfoDB {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NodeInfoDB.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfoDB.class);
 
     public static HashMap<Integer, NodeInfo> nodeInfos = new HashMap();
     static{
-        //nodeInfos.put(1, new NodeInfo());
     }
 
-
-    public static List<NodeInfo> getNodeInfos(){
+    public static List<NodeInfo> getAllNodes(){
         return new ArrayList<NodeInfo>(nodeInfos.values());
     }
 
-    public static NodeInfo getNodebyName(String name){
+    public static NodeInfo getNodeByName(String name){
         for (NodeInfo node : nodeInfos.values()){
-            LOG.info(node.getName());
             if(node.getName().equals(name)){
-                LOG.info(node.getName());
                 return node;
             }
         }
+        LOGGER.error("There is no Node in database with this name");
         return null;
     }
 
-    public static NodeInfo createNodeRegister(NodeInfo nodeInfo){
+    public static NodeInfo createNewNode(NodeInfo nodeInfo){
 
         Random rand = new Random();
-
         int  n = rand.nextInt(1000) + 1;
 
         return nodeInfos.put(n, new NodeInfo(nodeInfo.getName(),
-                nodeInfo.getLocation(),nodeInfo.getIPAdress(),nodeInfo.getDescription(),
+                nodeInfo.getLocation(),nodeInfo.getIPAddress(),nodeInfo.getDescription(),
                 nodeInfo.getConnectors(),nodeInfo.getMeta()));
     }
-
 }

@@ -6,8 +6,6 @@ import java.util.List;
 
 public class SensorRecive {
 
-        int code;
-
         @SerializedName("data")
         List<Sensor> sensorList;
 
