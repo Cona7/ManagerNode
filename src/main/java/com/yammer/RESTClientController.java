@@ -37,10 +37,13 @@ public class RESTClientController
 
 
     @GET
-    @Path("/sensors/")
-    public String getSensors()
+    @Path("/{name}/sensors/")
+    public String getSensors(@PathParam("name") String name)
     {
-        WebTarget webTarget = client.target("http://10.129.0.141:8080/api/sensorReadings/sensor_temp");
+        NodeInfo nodeInfo = new NodeInfo();
+        nodeInfo = NodeInfoDB.getNodebyName(name);
+        LOG.info(nodeInfo.getIPAdress());
+        WebTarget webTarget = client.target("http://" + nodeInfo.getIPAdress() + ":8080/api/sensorReadings/sensor_temp");
         Invocation.Builder invocationBuilder =  webTarget.request(MediaType.APPLICATION_JSON);
         Response response = invocationBuilder.get();
 
@@ -51,7 +54,24 @@ public class RESTClientController
         SensorRecive sensorRecive = new Gson().fromJson(response.readEntity(String.class), SensorRecive.class);
 
         return sensorRecive.getSensorList().toString();
+    }
 
+    @GET
+    @Path("/sensors/")
+    public String getSensors1()
+    {
+        WebTarget webTarget = client.target("http://10.19.128.214:8080/api/sensorReadings/sensor_temp");
+        Invocation.Builder invocationBuilder =  webTarget.request(MediaType.APPLICATION_JSON);
+        Response response = invocationBuilder.get();
+
+        LoggerFactory.getLogger(App.class).error(response.getStatusInfo().toString());
+
+//        Object output = response.readEntity(String.class);
+
+        SensorRecive sensorRecive = new Gson().fromJson(response.readEntity(String.class), SensorRecive.class);
+
+        return sensorRecive.getSensorList().toString();
+    }
 
 //
 //        JsonParser jp = new JsonParser();
@@ -64,7 +84,7 @@ public class RESTClientController
 //            sensors.add(sensor);
 //        }
 //        return sensors.toString();
-    }
+
 
 
     @GET
@@ -84,10 +104,12 @@ public class RESTClientController
     }
 
     @GET
-    @Path("/sensors/{startDate}")
-    public String getSensorsbyDateStart(@PathParam("startDate") String startDate)
+    @Path("/{name}/sensors/{startDate}")
+    public String getSensorsbyDateStart(@PathParam("name") String name, @PathParam("startDate") String startDate)
     {
-        WebTarget webTarget = client.target("http://10.129.0.141:8080/api/sensorReadings/sensor_temp?startDate="+startDate);
+        NodeInfo nodeInfo = new NodeInfo();
+        nodeInfo = NodeInfoDB.getNodebyName(name);
+        WebTarget webTarget = client.target("http://" + nodeInfo.getIPAdress() + ":8080/api/sensorReadings/sensor_temp?startDate="+startDate);
         Invocation.Builder invocationBuilder =  webTarget.request(MediaType.APPLICATION_JSON);
         Response response = invocationBuilder.get();
 
@@ -98,19 +120,19 @@ public class RESTClientController
         return sensorRecive.getSensorList().toString();
 
     }
-
-    @GET
-    @Path("/sen/")
-    public String getEmployeeById()
-    {
-        //Do not hard code in your application
-        WebTarget webTarget = client.target("http://"+NodeRegisterDB.nodeRegisters.get(1).getIPAdress()+":8080/sensors/temp");
-        Invocation.Builder invocationBuilder =  webTarget.request(MediaType.APPLICATION_JSON);
-        Response response = invocationBuilder.get();
-        List<Sensor> sensors= new ArrayList<Sensor>();
-        sensors = response.readEntity(ArrayList.class);
-        return sensors.toString();
-    }
+//
+//    @GET
+//    @Path("/sen/")
+//    public String getEmployeeById()
+//    {
+//        //Do not hard code in your application
+//        WebTarget webTarget = client.target("http://"+NodeRegisterDB.nodeRegisters.get(1).getIPAdress()+":8080/sensors/temp");
+//        Invocation.Builder invocationBuilder =  webTarget.request(MediaType.APPLICATION_JSON);
+//        Response response = invocationBuilder.get();
+//        List<Sensor> sensors= new ArrayList<Sensor>();
+//        sensors = response.readEntity(ArrayList.class);
+//        return sensors.toString();
+//    }
 
 
     @POST
@@ -121,13 +143,13 @@ public class RESTClientController
         Response response = webTarget.request().post(Entity.json(nodeRegister));
         return response;
     }
-
-    @POST
-    @Path("/nodeRegister/other")
-    public Response postNodeRegToOtherSensors(NodeRegister nodeRegister)
-    {
-        WebTarget webTarget = client.target("http://localhost:8080/nodeRegister");
-        Response response = webTarget.request().post(Entity.json(nodeRegister));
-        return response;
-    }
+//
+//    @POST
+//    @Path("/nodeRegister/other")
+//    public Response postNodeRegToOtherSensors(NodeRegister nodeRegister)
+//    {
+//        WebTarget webTarget = client.target("http://localhost:8080/nodeRegister");
+//        Response response = webTarget.request().post(Entity.json(nodeRegister));
+//        return response;
+//    }
 }

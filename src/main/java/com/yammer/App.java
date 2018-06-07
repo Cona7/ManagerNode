@@ -1,7 +1,5 @@
 package com.yammer;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.setup.Bootstrap;
@@ -13,14 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-
 
 public class App extends Application<Configuration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -32,7 +22,7 @@ public class App extends Application<Configuration> {
     @Override
     public void run(Configuration c, Environment e) throws Exception {
 
-        final Client client = new JerseyClientBuilder(e).build("DemoRESTClient");
+        final Client client = new JerseyClientBuilder(e).build("ApiRESTClient");
 
         LOGGER.info("Registering NodeRegisterRESTController");
         e.jersey().register(new NodeRegisterRESTController(e.getValidator(), client));
@@ -47,6 +37,7 @@ public class App extends Application<Configuration> {
 
         LOGGER.info("Registering MQTT");
         MQTT mqtt = new MQTT();
+
         mqtt.setHost("10.19.128.214", 1883);
         FutureConnection connection = mqtt.futureConnection();
         connection.connect();
@@ -61,14 +52,10 @@ public class App extends Application<Configuration> {
                    try {
                        receive = connection.receive();
                        message = receive.await();
+                       message.ack();
+                       String recivedMessage = new String(message.getPayload(), "UTF-8");
+                       System.out.println(recivedMessage);
                    } catch (Exception e) {
-                       e.printStackTrace();
-                   }
-                   message.ack();
-                   try {
-                       String bok = new String(message.getPayload(), "UTF-8");
-                       System.out.println(bok);
-                   } catch (UnsupportedEncodingException e) {
                        e.printStackTrace();
                    }
                }

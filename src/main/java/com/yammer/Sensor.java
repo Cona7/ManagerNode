@@ -7,8 +7,6 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class Sensor {
 
-    @NotNull
-    private int id;
     @NotBlank
     private String name;
     @NotBlank
@@ -21,20 +19,11 @@ public class Sensor {
     public Sensor() {
    }
 
-    public Sensor(int id, String name, String date, int value, String unit) {
-        this.id = id;
+    public Sensor(String name, String date, int value, String unit) {
         this.name = name;
         this.date = date;
         this.value = value;
         this.unit = unit;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
