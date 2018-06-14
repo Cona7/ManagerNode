@@ -18,7 +18,7 @@ public class RESTClientController
 {
     private Client client;
 
-    public RESTClientController(Client client) throws Exception {
+    public RESTClientController(Client client){
         this.client = client;
     }
 

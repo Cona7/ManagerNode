@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 
 public class App extends Application<Configuration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static PhilipsHueMethods philipsHueMethods = new PhilipsHueMethods();
 
     @Override
     public void initialize(Bootstrap<Configuration> b) {
@@ -40,22 +41,27 @@ public class App extends Application<Configuration> {
         alarmInfinteLoop();
     }
 
-    private static void alarmInfinteLoop(){
+    private static void alarmInfinteLoop() throws Exception {
 
         MQTT mqtt = new MQTT();
 
         try {
-            mqtt.setHost("10.19.128.214", 1883);
+            mqtt.setHost("localhost", 1883);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        LOGGER.info("Successfully connected on host: 10.19.128.214");
+        LOGGER.info("Successfully connected on host: localhost");
         FutureConnection connection = mqtt.futureConnection();
         connection.connect();
         connection.subscribe(new Topic[]{new Topic("Alarm", QoS.AT_LEAST_ONCE)});
 
         LOGGER.info("Successfully subscribed on topic Alarm");
         LOGGER.info("Waiting for messages");
+
+//        philipsHueMethods.philipsHueTurnOn(1);
+//        philipsHueMethods.philipsHueTurnOn(2);
+//        philipsHueMethods.philipsHueTurnOn(3);
+
         Thread t1 = new Thread(new Runnable() {
             public void run()
             {
@@ -63,16 +69,67 @@ public class App extends Application<Configuration> {
                     Message message = null;
                     Future<Message> receive;
                     try {
+
                         receive = connection.receive();
                         message = receive.await();
                         message.ack();
                         String receivedMessage = new String(message.getPayload(), "UTF-8");
                         System.out.println(receivedMessage);
+
+                        alarmRecognizer(receivedMessage);
+                        //ako ne bude radilo vrati nazad alarmRecognizer
+
+                        Thread.sleep(3000);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }});
         t1.start();
+    }
+
+    private static void alarmRecognizer(String alarm){
+
+        if(alarm.split(" ")[3].equals("Low")){
+            philipsHueMethods.philipsHueBlueLights(1);
+            philipsHueMethods.philipsHueTurnOn(1);
+            philipsHueMethods.philipsHueBlueLights(1);
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            philipsHueMethods.philipsHueTurnOff(1);
+
+        }  else if (alarm.split(" ")[4].equals("concentration")){
+
+            philipsHueMethods.philipsHueGreenLights(3);
+            philipsHueMethods.philipsHueTurnOn(3);
+            philipsHueMethods.philipsHueGreenLights(3);
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            philipsHueMethods.philipsHueTurnOff(3);
+
+        } else {
+
+            philipsHueMethods.philipsHueRedLights(2);
+            philipsHueMethods.philipsHueTurnOn(2);
+            philipsHueMethods.philipsHueRedLights(2);
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            philipsHueMethods.philipsHueTurnOff(2);
+        }
+
     }
 }

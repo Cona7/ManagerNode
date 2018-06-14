@@ -1,7 +1,10 @@
 com/yammer/App$1.class
 com/yammer/App.class
 com/yammer/NodeRegisterRESTController.class
+com/yammer/PhilipsHueMethods.class
+com/yammer/Config.class
 com/yammer/SensorRecive.class
+com/yammer/PhilipsHueApiHelper.class
 com/yammer/NodeInfo.class
 com/yammer/NodeInfoDB.class
 com/yammer/RESTClientController.class
